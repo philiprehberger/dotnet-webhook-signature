@@ -4,29 +4,39 @@ using System.Text;
 namespace Philiprehberger.WebhookSignature;
 
 /// <summary>
-/// Static methods for HMAC-SHA256 webhook signing and verification.
+/// Supported HMAC hash algorithms for webhook signing and verification.
+/// </summary>
+public enum HashAlgorithm
+{
+    SHA256,
+    SHA384,
+    SHA512
+}
+
+/// <summary>
+/// Static methods for HMAC webhook signing and verification.
 /// </summary>
 public static class Webhook
 {
     /// <summary>
-    /// Signs a payload with HMAC-SHA256 and returns a signature string.
+    /// Signs a payload with the specified HMAC algorithm and returns a signature string.
     /// Format: {timestamp}.{hex-signature}
     /// </summary>
-    public static string Sign(string payload, string secret, long? timestamp = null)
+    public static string Sign(string payload, string secret, long? timestamp = null, HashAlgorithm algorithm = HashAlgorithm.SHA256)
     {
         ArgumentException.ThrowIfNullOrEmpty(payload);
         ArgumentException.ThrowIfNullOrEmpty(secret);
 
         var ts = timestamp ?? DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var signedPayload = $"{ts}.{payload}";
-        var hash = ComputeHmac(signedPayload, secret);
+        var hash = ComputeHmac(signedPayload, secret, algorithm);
         return $"{ts}.{hash}";
     }
 
     /// <summary>
     /// Verifies a webhook signature against the payload and secret.
     /// </summary>
-    public static bool Verify(string payload, string signature, string secret, int toleranceSeconds = 300)
+    public static bool Verify(string payload, string signature, string secret, int toleranceSeconds = 300, HashAlgorithm algorithm = HashAlgorithm.SHA256)
     {
         ArgumentException.ThrowIfNullOrEmpty(payload);
         ArgumentException.ThrowIfNullOrEmpty(signature);
@@ -41,18 +51,65 @@ public static class Webhook
         if (Math.Abs(now - timestamp) > toleranceSeconds) return false;
 
         var signedPayload = $"{timestamp}.{payload}";
-        var expected = ComputeHmac(signedPayload, secret);
+        var expected = ComputeHmac(signedPayload, secret, algorithm);
 
         return CryptographicOperations.FixedTimeEquals(
             Encoding.UTF8.GetBytes(parts[1]),
             Encoding.UTF8.GetBytes(expected));
     }
 
-    private static string ComputeHmac(string data, string secret)
+    /// <summary>
+    /// Extracts a webhook signature from a header dictionary.
+    /// Returns null if the header is not found. Case-insensitive header matching.
+    /// </summary>
+    public static string? ExtractFromHeaders(IDictionary<string, string> headers, string headerName = "X-Webhook-Signature")
+    {
+        ArgumentNullException.ThrowIfNull(headers);
+        ArgumentException.ThrowIfNullOrEmpty(headerName);
+
+        foreach (var kvp in headers)
+        {
+            if (string.Equals(kvp.Key, headerName, StringComparison.OrdinalIgnoreCase))
+                return kvp.Value;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Verifies a webhook signature by trying each secret in order.
+    /// Returns true if any secret produces a valid signature. Useful for key rotation.
+    /// </summary>
+    public static bool VerifyWithKeyRotation(string payload, string signature, IEnumerable<string> secrets, int toleranceSeconds = 300, HashAlgorithm algorithm = HashAlgorithm.SHA256)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(payload);
+        ArgumentException.ThrowIfNullOrEmpty(signature);
+        ArgumentNullException.ThrowIfNull(secrets);
+
+        foreach (var secret in secrets)
+        {
+            if (string.IsNullOrEmpty(secret)) continue;
+
+            if (Verify(payload, signature, secret, toleranceSeconds, algorithm))
+                return true;
+        }
+
+        return false;
+    }
+
+    private static string ComputeHmac(string data, string secret, HashAlgorithm algorithm)
     {
         var keyBytes = Encoding.UTF8.GetBytes(secret);
         var dataBytes = Encoding.UTF8.GetBytes(data);
-        var hash = HMACSHA256.HashData(keyBytes, dataBytes);
+
+        var hash = algorithm switch
+        {
+            HashAlgorithm.SHA256 => HMACSHA256.HashData(keyBytes, dataBytes),
+            HashAlgorithm.SHA384 => HMACSHA384.HashData(keyBytes, dataBytes),
+            HashAlgorithm.SHA512 => HMACSHA512.HashData(keyBytes, dataBytes),
+            _ => throw new ArgumentOutOfRangeException(nameof(algorithm))
+        };
+
         return Convert.ToHexString(hash).ToLowerInvariant();
     }
 }
@@ -64,17 +121,19 @@ public sealed class WebhookVerifier
 {
     private readonly string _secret;
     private readonly int _toleranceSeconds;
+    private readonly HashAlgorithm _algorithm;
 
-    public WebhookVerifier(string secret, int toleranceSeconds = 300)
+    public WebhookVerifier(string secret, int toleranceSeconds = 300, HashAlgorithm algorithm = HashAlgorithm.SHA256)
     {
         ArgumentException.ThrowIfNullOrEmpty(secret);
         _secret = secret;
         _toleranceSeconds = toleranceSeconds;
+        _algorithm = algorithm;
     }
 
     /// <summary>
     /// Verifies a webhook signature against the payload.
     /// </summary>
     public bool Verify(string payload, string signature) =>
-        Webhook.Verify(payload, signature, _secret, _toleranceSeconds);
+        Webhook.Verify(payload, signature, _secret, _toleranceSeconds, _algorithm);
 }

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 (2026-03-13)
+
+### Added
+
+- Support for HMAC-SHA384 and HMAC-SHA512 algorithms via `HashAlgorithm` enum
+- `ExtractFromHeaders` method for parsing signatures from HTTP headers
+- `VerifyWithKeyRotation` method for verifying against multiple secrets
+
 ## 0.1.1 (2026-03-10)
 
 - Fix README path in csproj so README displays on nuget.org
