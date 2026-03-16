@@ -111,6 +111,12 @@ public IActionResult HandleWebhook(
 
 Signatures use the format `{unix-timestamp}.{hex-encoded-hmac}`. The timestamp is included in the HMAC input to prevent replay attacks.
 
+## Development
+
+```bash
+dotnet build src/Philiprehberger.WebhookSignature.csproj --configuration Release
+```
+
 ## License
 
 MIT
