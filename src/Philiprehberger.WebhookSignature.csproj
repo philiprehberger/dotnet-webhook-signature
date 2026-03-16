@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Philiprehberger.WebhookSignature</PackageId>
-    <Version>0.2.0</Version>
+    <Version>0.2.1</Version>
     <Authors>Philip Rehberger</Authors>
     <Description>HMAC-SHA256 webhook signing and verification with replay prevention</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
