@@ -6,7 +6,7 @@
 
 HMAC webhook signing and verification with replay prevention. Supports SHA-256, SHA-384, and SHA-512.
 
-## Install
+## Installation
 
 ```bash
 dotnet add package Philiprehberger.WebhookSignature
@@ -107,7 +107,7 @@ public IActionResult HandleWebhook(
 | `Webhook.VerifyWithKeyRotation(payload, signature, secrets, toleranceSeconds?, algorithm?)` | Verify against multiple secrets for key rotation |
 | `WebhookVerifier.Verify(payload, signature)` | Instance method for DI scenarios |
 
-## Signature Format
+### Signature Format
 
 Signatures use the format `{unix-timestamp}.{hex-encoded-hmac}`. The timestamp is included in the HMAC input to prevent replay attacks.
 
