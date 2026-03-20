@@ -8,8 +8,19 @@ namespace Philiprehberger.WebhookSignature;
 /// </summary>
 public enum HashAlgorithm
 {
+    /// <summary>
+    /// HMAC-SHA256 (default). Produces a 256-bit hash.
+    /// </summary>
     SHA256,
+
+    /// <summary>
+    /// HMAC-SHA384. Produces a 384-bit hash.
+    /// </summary>
     SHA384,
+
+    /// <summary>
+    /// HMAC-SHA512. Produces a 512-bit hash.
+    /// </summary>
     SHA512
 }
 
@@ -123,6 +134,9 @@ public sealed class WebhookVerifier
     private readonly int _toleranceSeconds;
     private readonly HashAlgorithm _algorithm;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WebhookVerifier"/> class with the specified secret, tolerance, and algorithm.
+    /// </summary>
     public WebhookVerifier(string secret, int toleranceSeconds = 300, HashAlgorithm algorithm = HashAlgorithm.SHA256)
     {
         ArgumentException.ThrowIfNullOrEmpty(secret);
