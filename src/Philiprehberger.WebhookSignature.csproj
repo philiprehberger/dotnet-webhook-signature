@@ -7,9 +7,9 @@
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageId>Philiprehberger.WebhookSignature</PackageId>
-    <Version>0.2.3</Version>
+    <Version>0.2.4</Version>
     <Authors>Philip Rehberger</Authors>
-    <Description>HMAC-SHA256 webhook signing and verification with replay prevention</Description>
+    <Description>HMAC webhook signing and verification with replay prevention — supports SHA-256, SHA-384, and SHA-512.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/philiprehberger/dotnet-webhook-signature</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

@@ -4,7 +4,7 @@
 [![NuGet](https://img.shields.io/nuget/v/Philiprehberger.WebhookSignature.svg)](https://www.nuget.org/packages/Philiprehberger.WebhookSignature)
 [![License](https://img.shields.io/github/license/philiprehberger/dotnet-webhook-signature)](LICENSE)
 
-HMAC webhook signing and verification with replay prevention. Supports SHA-256, SHA-384, and SHA-512.
+HMAC webhook signing and verification with replay prevention — supports SHA-256, SHA-384, and SHA-512.
 
 ## Installation
 
