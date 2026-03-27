@@ -3,6 +3,7 @@
 [![CI](https://github.com/philiprehberger/dotnet-webhook-signature/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/dotnet-webhook-signature/actions/workflows/ci.yml)
 [![NuGet](https://img.shields.io/nuget/v/Philiprehberger.WebhookSignature.svg)](https://www.nuget.org/packages/Philiprehberger.WebhookSignature)
 [![License](https://img.shields.io/github/license/philiprehberger/dotnet-webhook-signature)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
 
 HMAC webhook signing and verification with replay prevention — supports SHA-256, SHA-384, and SHA-512.
 
